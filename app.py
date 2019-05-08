@@ -70,12 +70,22 @@ class wait(RequestHandler):
     def get(self):
         self.render('wait.html')
 
+class switchViews(RequestHandler):
+
+    def get(self):
+        to_which = self.get_argument('to_which')
+        if to_which == 'student':
+            self.redirect('/getMentors')
+        else:
+            t = 0
+            #self.redirect('/requestQueue')
 
 if __name__ == "__main__":
     handler_mapping = [
                        (r'/logIn', logIn),
                        (r'/getMentors', getMentors),
-                       (r'/wait', wait)
+                       (r'/wait', wait),
+                       (r'/switchViews', switchViews)
                       ]
     application = Application(handler_mapping)
     application.listen(7777)
