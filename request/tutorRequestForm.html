@@ -1,0 +1,33 @@
+<html>
+    <style>
+        body{
+            font-size: 15pt;
+            font-family: arial;
+        }
+    </style>
+<body>
+    <h1> Request a Tutor </h1>
+        <form method = "POST" action="/getMentors">
+            Subject:
+            <select name="subject">
+                <option value="cs">Computer Science</option>
+                <option value="history">History</option>
+                <option value="dance">Mathematics</option>
+                <option value="math">Dance</option>
+            </select>
+            <br><br>
+            Expected tutoring time:
+            <select name="time">
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="1">1 hour</option>
+                <option value="more1">More than 1 hour</option>
+            </select>
+            <br><br>
+            Explain to your tutor what you need help with:
+            <input type="text" name="message" placeholder="Enter message" required>
+            <br><br>
+            <input type="submit" value="Submit Tutor Request">
+        </form>
+</body>
