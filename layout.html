@@ -3,6 +3,9 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script type="text/javascript">
+      var id = {{id|tojson}} 
+    </script>
 
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
@@ -40,25 +43,21 @@ nav a {
 }
     </style>
 		{% block scripts %}
-
 		{% end%}
-
 	</head>
   <body>
-    
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <a class="navbar-brand" href="#">TUBER</a>
-
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
-        <a class="navigation-link" href="http://127.0.0.1:5000/Add_item">Student</a>
+        <a class="navigation-link" href="http://localhost:7777/getMentors?id=8">Student</a>
       </li>
               <li class="navx-item">
-        <a class="flash-lin" href="http://127.0.0.1:5000/imageid">Mentor</a>
+        <a class="flash-lin" href="http://localhost:7777/getMentors?id=8">Mentor</a>
       </li>
 
       </li>
