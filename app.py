@@ -91,6 +91,7 @@ class switchViews(RequestHandler):
             IP_to_id_map.pop(id, None)
             self.redirect('/getMentors?=id' + str(id))
         else:
+            IP_to_id_map[id] = self.request.host
             self.redirect('/requestQueue?=id' + str(id))
 
 class requestQueue(RequestHandler):
