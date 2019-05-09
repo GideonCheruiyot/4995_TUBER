@@ -1,13 +1,13 @@
-<html>
-  <head>
+{% extends 'layout.html' %}
+  <script> getLocation() </script>
+{% block scripts %}
+
     <style>
-        body{
-            font-size: 15pt;
-            font-family: arial;
-        }
+
+
+
     </style>
     <script>
-
     function getLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
@@ -15,46 +15,109 @@
         x.innerHTML = "Geolocation is not supported by this browser.";
       }
     }
-
     function showPosition(position) {
       const lon = document.querySelector('#lon')
       const lat = document.querySelector('#lat')
       lon.value = position.coords.longitude
       lat.value = position.coords.latitude
     }
+    (function() {
+
+  var customBackground = document.getElementById("customBackground");
+
+  function addDropdownClass(e) {
+    var target = e.target;
+    if (target) {
+      if (target.nodeName.toLowerCase() === "label") {
+        target.parentElement.classList.toggle("active");
+      }
+    }
+  }
+
+  function toggleBackgroundClass(e) {
+    var target = e.target;
+    if (target) {
+      var backgroundClass = target.getAttribute("id");
+      if (customBackground) {
+        customBackground.className = backgroundClass;
+      }
+    }
+  }
+
+  var customDropdown = document.getElementById("customDropdown");
+  if (customDropdown) {
+    customDropdown.addEventListener("click", addDropdownClass);
+  }
+
+  var customInputs = document.getElementsByClassName("custom-input");
+  if (customInputs) {
+    Array.prototype.forEach.call(customInputs, function(el, i) {
+      el.addEventListener("change", toggleBackgroundClass);
+    });
+  }
+
+})();
 
     </script>
   </head>
-<body>
-    <script> getLocation() </script>
-    <h1> Request a Tutor </h1>
-        <form method = "POST" action="/getMentors">
-            Subject:
-            <select name="subject">
+{% end %}
+{% block content %}
+ <script> getLocation() </script>
+    <div class="col-sm-4">
+        <h1> Request a Tutor </h1>
+    </div>
+
+<div class="container mt-5 p-4 bg-light" style="border:1px solid grey; border-radius:10px; box-shadow:0 0 10px 1px grey" >
+
+  <div class="row" >
+    <div class="col-12">
+    <p class="mt-1" style="font-size: 17px"><strong>Please enter the information below.</strong></p>
+    </div>
+    <form method = "POST" action="/getMentors">
+    <div class="col-4">
+            <label for="subject"><strong>Subject: </strong></label>
+            <select id = "subject" name="subject">
                 <option value="cs">Computer Science</option>
                 <option value="history">History</option>
                 <option value="dance">Mathematics</option>
                 <option value="math">Dance</option>
             </select>
-            <br><br>
-            Expected tutoring time:
-            <select name="time">
+            <br>
+    </div>
+  </div>
+
+
+  <div  class="row" >
+      <div class="col-4">
+        <br>
+            <label for="time"><strong>Expected tutoring time: </strong></label>
+               <select id = "time" name="time">
                 <option value="15">15 min</option>
                 <option value="30">30 min</option>
                 <option value="45">45 min</option>
                 <option value="1">1 hour</option>
                 <option value="more1">More than 1 hour</option>
-            </select>
-            <br><br>
-            Explain to your tutor what you need help with:
-            <input type="text" name="message" placeholder="Enter message" required>
-            <br><br>
-            <input type="submit" value="Submit Tutor Request">
+            </select>   
+            <br>
+            <br>
+    </div>
+  </div>
+
+
+    <div class="row">
+    <div class="col-4">
+      <label for="exampleFormControlTextarea1"><strong>Explain to your tutor what you need help with: </strong></label>
+    <textarea name="message"  placeholder="Enter message"  class="form-control" id="exampleFormControlTextarea1" rows="5"> </textarea>
+    </div>
+  </div>
+  
             <input hidden type="text" id="lon" name="lon">
             <input hidden type="text" id="lat" name="lat">
-        </form>
-        <br><br>
-        <br><br>
-        <button action="/switchViews?to_which=mentor">
-        Switch to Mentor Mode</button>
-</body>
+            <input type="submit" value="Submit Tutor Request" class="btn btn-primary  mt-4 mb-4" style="width:100%">
+            </form>
+  
+</div>
+
+
+{% end %}
+
