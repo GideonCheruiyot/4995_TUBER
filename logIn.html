@@ -14,7 +14,7 @@
   top:50%;
   left:50%;
   transform:translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
   text-align:center;
 }
 .box h1 {
@@ -57,6 +57,9 @@
 .box input[type = "submit"]:hover{
   background:#2ecc71;
 }
+.r {
+  color:white;
+}
 
   </style>
 <body>
@@ -65,24 +68,13 @@
     <h1>Enter your username and password</h1>
     <input type="text" name="username" placeholder="Username">
     <input type="password" name="password" placeholder="Password">
+    <div class="r">
+      <input type="radio" name="which" value="student"> Student <br>
+      <input type="radio" name="which" value="mentor"> Mentor <br>
+    </div>
     <input type="submit" name="" value = "GO!" placeholder="Login">
   </form>
 </body>
 
 
   </html>
-
-
-
- <!--  
-    <h1>Log in page </h1>
-    <form method="POST" action="/logIn">
-    <p> Enter your username and password
-     <input type="text" name="username">
-     <input type="text" name="password">
-     <input type="submit" value="GO!"></p>
-    </form>
-
- -->
-
-

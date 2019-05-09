@@ -2,16 +2,17 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <script type="text/javascript">
-      var id = {{id|tojson}} 
-    </script>
+		<meta name="viewport" content="width=device-width,
+																	 initial-scale=1,
+																	 shrink-to-fit=no">
 
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
 		<title>Data Analytics Project</title>
 
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"> 
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+		crossorigin="anonymous">
 		</script>
 		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -54,18 +55,17 @@ nav a {
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
-        <a class="navigation-link" href="http://localhost:7777/getMentors?id=8">Student</a>
+				<form method = "POST" action = "/switchViews" class="box">
+			    <input type="radio" name="to_which" value = "student"> Student Mode
+					<input type="radio" name="to_which" value = "mentor"> Mentor Mode
+					<input type="submit" name="" value = "Switch Mode!">
+					<input hidden type="hidden" name="_id" value="{{ _id }}"> 
+			  </form>
       </li>
-              <li class="navx-item">
-        <a class="flash-lin" href="http://localhost:7777/getMentors?id=8">Mentor</a>
-      </li>
-
-      </li>
-
     </ul>
   </div>
 </nav>
-  
+
     <div id="content">{% block content %}
 
     {% end%}</div>

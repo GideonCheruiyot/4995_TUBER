@@ -51,13 +51,15 @@ radius = .07
 
 class getMentors(RequestHandler):
 
-    # renders the request page
+    # renders the request page adding the id to the navigation bar
+    # that allows for changing views
     def get(self):
         id = self.get_argument('id')
-        self.render("tutorRequestForm.html")
+        self.render("tutorRequestForm.html", _id=id)
 
     # fetches the student IP and the content of the request
     # queries the database for potential matches and returns them
+    # TO COMPLETE WITH MATCHER SERVICE
     def post(self):
         IP = self.request.host
         subject = self.get_body_argument('subject')
@@ -65,6 +67,10 @@ class getMentors(RequestHandler):
         message  = self.get_body_argument('message')
         lon = self.get_body_argument('lon')
         lat = self.get_body_argument('lat')
+        print('ok')
+        print(lon)
+        print('fine')
+        print(lat)
         student_location = [float(lon), float(lat)]
         query = {"loc": SON([("$near", student_location),
                              ("$maxDistance", radius)]),
@@ -75,30 +81,36 @@ class getMentors(RequestHandler):
         for res in prelim:
             results.append(res)
 
-        self.redirect('/wait?id=' + str(id))
+        self.redirect('/wait')
 
+# waiting service for student that submitted a request
 class wait(RequestHandler):
 
     def get(self):
         self.render('wait.html')
 
+# service that takes care of switching between mentor and student views
 class switchViews(RequestHandler):
 
-    def get(self):
-        to_which = self.get_argument('to_which')
-        id = self.get_argument('id')
+    # removes the IP from the active cache if switching from mentor to student
+    def post(self):
+        to_which = self.get_body_argument('to_which')
+        id = self.get_body_argument('_id')
         if to_which == 'student':
             IP_to_id_map.pop(id, None)
-            self.redirect('/getMentors?=id' + str(id))
+            self.redirect('/getMentors?id=' + str(id))
         else:
-            IP_to_id_map[id] = self.request.host
-            self.redirect('/requestQueue?=id' + str(id))
+            self.redirect('/requestQueue?id=' + str(id))
 
+# takes care of what happens on the awaiting mentor page
 class requestQueue(RequestHandler):
 
+    # renders the page with the id in
+    # the navigation bar and adds the mentor to the active cache
     def get(self):
         id = self.get_argument('id')
         IP_to_id_map[id] = self.request.host
+        self.render('mentor.html', _id=id)
 
 
 if __name__ == "__main__":
@@ -107,7 +119,7 @@ if __name__ == "__main__":
                        (r'/getMentors', getMentors),
                        (r'/wait', wait),
                        (r'/switchViews', switchViews),
-                       (r'/IPTracker', IPTracker)
+                       (r'/requestQueue', requestQueue)
                       ]
     application = Application(handler_mapping)
     application.listen(7777)

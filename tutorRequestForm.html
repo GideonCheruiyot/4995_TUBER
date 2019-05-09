@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
-  <script> getLocation() </script>
-{% block scripts %}
 
+{% block scripts %}
     <style>
 h2 {
   text-align: center;
@@ -20,11 +19,14 @@ h2 {
       }
     }
     function showPosition(position) {
-      const lon = document.querySelector('#lon')
-      const lat = document.querySelector('#lat')
-      lon.value = position.coords.longitude
-      lat.value = position.coords.latitude
+      var lon = document.querySelector('#lon');
+      lon.setAttribute("value", position.coords.longitude)
+      var lat = document.querySelector('#lat');
+      lat.setAttribute("value", position.coords.latitude)
     }
+
+    getLocation();
+
     (function() {
 
   var customBackground = document.getElementById("customBackground");
@@ -62,11 +64,13 @@ h2 {
 
 })();
 
-    </script>
+ </script>
   </head>
-{% end %}
-{% block content %}
- <script> getLocation() </script>
+
+  {% end %}
+  {% block content %}
+
+
     <div class="col-sm-4">
       <br>
       <br>
@@ -103,7 +107,7 @@ h2 {
                 <option value="45">45 min</option>
                 <option value="1">1 hour</option>
                 <option value="more1">More than 1 hour</option>
-            </select>   
+            </select>
             <br>
             <br>
     </div>
@@ -116,14 +120,12 @@ h2 {
     <textarea name="message"  placeholder="Enter message"  class="form-control" id="exampleFormControlTextarea1" rows="5"> </textarea>
     </div>
   </div>
-  
+
             <input hidden type="text" id="lon" name="lon">
             <input hidden type="text" id="lat" name="lat">
             <input type="submit" value="Submit Tutor Request" class="btn btn-primary  mt-4 mb-4" style="width:100%">
-            </form>
-  
+  </form>
+
 </div>
 
-
 {% end %}
-
