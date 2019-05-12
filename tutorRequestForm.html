@@ -7,10 +7,30 @@ h2 {
   font-weight: 100;
   font-size: 3em;
 }
-
-
     </style>
+
     <script>
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var id = urlParams.getAll('id')[0]
+
+      var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
+      
+      ws.onopen = function() {
+        console.log('opened.');
+      };
+     
+      ws.onmessage = function (evt) {
+       alert(evt.data);
+      };
+
+    </script>
+
+    <script>
+
     function getLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
@@ -28,9 +48,7 @@ h2 {
     getLocation();
 
     (function() {
-
   var customBackground = document.getElementById("customBackground");
-
   function addDropdownClass(e) {
     var target = e.target;
     if (target) {
@@ -39,7 +57,6 @@ h2 {
       }
     }
   }
-
   function toggleBackgroundClass(e) {
     var target = e.target;
     if (target) {
@@ -49,21 +66,17 @@ h2 {
       }
     }
   }
-
   var customDropdown = document.getElementById("customDropdown");
   if (customDropdown) {
     customDropdown.addEventListener("click", addDropdownClass);
   }
-
   var customInputs = document.getElementsByClassName("custom-input");
   if (customInputs) {
     Array.prototype.forEach.call(customInputs, function(el, i) {
       el.addEventListener("change", toggleBackgroundClass);
     });
   }
-
 })();
-
  </script>
   </head>
 
@@ -121,8 +134,8 @@ h2 {
     </div>
   </div>
 
-            <input hidden type="text" id="lon" name="lon">
-            <input hidden type="text" id="lat" name="lat">
+            <input hidden type="text" id="lon" name="lon" value="0">
+            <input hidden type="text" id="lat" name="lat" value="0">
             <input type="submit" value="Submit Tutor Request" class="btn btn-primary  mt-4 mb-4" style="width:100%">
   </form>
 

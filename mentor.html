@@ -2,6 +2,34 @@
 
 {% block scripts %}
 
+    <script>
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+      var urlParams = new URLSearchParams(window.location.search);
+      var id = urlParams.getAll('id')[0]
+
+      var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
+      
+      ws.onopen = function() {
+        console.log('mentor connection opened.');
+      };
+
+      //get the initial list of open requests
+      function getOpenRequests (id) {
+        var request = new ()
+          
+
+
+      } 
+     
+      ws.onmessage = function (evt) {
+       alert(evt.data);
+      };
+
+
+    </script>
+
 
   <style>
 h2 {
@@ -15,14 +43,18 @@ h2 {
 {% end %}
 {% block content %}
 
+
   <body>
-    <div class="col-md-12">
+
+    <div class="col-sm-4">
       <br>
       <br>
         <h2> Hey Mentor, here are tutoring requests in your area : </h2>
 
-        
     </div>
-    
+
+
+
   </body>
+
 {% end %}
