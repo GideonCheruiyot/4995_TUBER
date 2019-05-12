@@ -44,9 +44,9 @@ class logIn(RequestHandler):
         else:
             id = res["_id"]
             if True:
-                self.redirect('/getMentors?id=' + str(id))
+                self.redirect('/getMentors?_id=' + str(id))
             else:
-                self.redirect('/requestQueue?id=' + str(id))
+                self.redirect('/requestQueue?_id=' + str(id))
 
 class sendMessage(RequestHandler):
     def get(self):
@@ -75,12 +75,13 @@ class matcherNotifications(WebSocketHandler):
 # for the request service search radius: radius: ~1 mile = .017 units
 # e.g. here within ~4 miles
 radius = 100
+requestIdGenerator = 0
 
 class getMentors(RequestHandler):
 
     # renders the request page
     def get(self):
-        id = self.get_argument('id')
+        id = self.get_argument('_id')
         self.render("tutorRequestForm.html", _id=id)
 
     # fetches the student IP and the content of the request
@@ -106,22 +107,48 @@ class getMentors(RequestHandler):
         for res in prelim:
             results.append(res)
         
+        requests[requestIdGenerator] = []
         for mentor in results:
             if mentor['_id'] in mentor_requests.keys():
-                mentor_requests[mentor['_id']].append((subject, time, message, student_location))      
+                mentor_requests[mentor['_id']].append((requestIdGenerator, subject, time, message, student_location))
             else:
-                mentor_requests[mentor['_id']] = [(subject, time, message, student_location)]
+                mentor_requests[mentor['_id']] = [(requestIdGenerator, subject, time, message, student_location)]
+            requests[requestIdGenerator].append(mentor['_id'])      
 
+        requestIdGenerator += 1
         print(results)
         print(mentor_requests)
 
-        self.redirect('/wait?id=' + str(id))
+        self.redirect('/wait?request_id=' + str(requestIdGenerator - 1) + '&_id=' + str(id))
+
+def updateRequestList(request_id):
+    global mentor_requests
+    for r in mentor_requests.keys():
+        listRequests = mentor_requests[r]
+        for req in listRequests:
+            if req[0] == request_id:
+                listRequests.remove(req)
+        mentor_requests[r] = listRequests
 
 class acceptRequest(RequestHandler):
 
     def post(self):
         id = self.get_body_argument('_id')
+        request_id = self.get_argument('request_id')
+        releventMentors = requests[request_id]
+        
+        # update the individual list of relevant requests for each mentor
+        updateRequestList(request_id)
 
+        # remove request from the list of open requests
+        requests.pop(request_id)
+        
+        # send message to all relevant mentor to update their request lists
+        for mentor in releventMentors:
+            if mentor != id:
+                opened_sockets[mentor].on_message(mentor_requests[mentor])
+        
+        self.redirect('/match?_id=' + str(id))
 
 class wait(RequestHandler):
 
@@ -136,22 +163,23 @@ class switchViews(RequestHandler):
         id = self.get_body_argument('_id')
         if to_which == 'student':
             IP_to_id_map.pop(id, None)
-            self.redirect('/getMentors?id=' + str(id))
+            self.redirect('/getMentors?_id=' + str(id))
         else:
-            self.redirect('/requestQueue?id=' + str(id))
+            self.redirect('/requestQueue?_id=' + str(id))
 
 class requestQueue(RequestHandler):
 
     # renders the page with the id in
     # the navigation bar and adds the mentor to the active cache
     def get(self):
-        id = int(self.get_argument('id'))
+        id = int(self.get_argument('_id'))
         IP_to_id_map[id] = self.request.host
 
         if id in mentor_requests.keys():
             requestList = mentor_requests[id]
         else:
             requestList = []
+
 
         self.render('mentor.html', _id=id, requestList=requestList)
 
@@ -163,7 +191,8 @@ if __name__ == "__main__":
                        (r'/switchViews', switchViews),
                        (r'/sendMessage', sendMessage),
 					   (r'/matcherNotifications/(.*)', matcherNotifications),
-                       (r'/requestQueue', requestQueue)
+                       (r'/requestQueue', requestQueue),
+                       (r'/acceptRequest', acceptRequest)
                       ]
     application = Application(handler_mapping)
     application.listen(7777)

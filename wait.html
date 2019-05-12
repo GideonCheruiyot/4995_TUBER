@@ -1,5 +1,28 @@
+
+
 <html>
+  <script>
+    //make an api call to the backend that will render 
+    var urlParams = new URLSearchParams(window.location.search);
+    var requestId = urlParams.getAll('request_id')[0]
+    var studentId = urlParams.getAll('_id')[0]
+
+    var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + studentId);
+
+    ws.onopen = function() {
+        console.log('student waiting connection opened.');
+      };
+
+    ws.onmessage = function (evt) {
+        data = evt.data
+ 
+
+        
+      };
+
+   </script>
   <style>
+
 body {
   margin: 0;
   padding: 0;
