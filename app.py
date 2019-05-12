@@ -18,6 +18,7 @@ cache = db.mentor_cache
 # mentors to match
 IP_to_id_map = {}
 mentor_requests = {}
+requests = {}
 opened_sockets = {}
 
 class logIn(RequestHandler):
@@ -46,11 +47,6 @@ class logIn(RequestHandler):
                 self.redirect('/getMentors?id=' + str(id))
             else:
                 self.redirect('/requestQueue?id=' + str(id))
-
-class sendMessage(RequestHandler):
-    def get(self):
-        for os in list(opened_sockets.keys()):
-            opened_sockets[os].on_message('Annie')
 
 class sendMessage(RequestHandler):
     def get(self):
@@ -121,6 +117,11 @@ class getMentors(RequestHandler):
 
         self.redirect('/wait?id=' + str(id))
 
+class acceptRequest(RequestHandler):
+
+    def post(self):
+        id = self.get_body_argument('_id')
+
 
 class wait(RequestHandler):
 
@@ -144,14 +145,14 @@ class requestQueue(RequestHandler):
     # renders the page with the id in
     # the navigation bar and adds the mentor to the active cache
     def get(self):
-        id = self.get_argument('id')
+        id = int(self.get_argument('id'))
         IP_to_id_map[id] = self.request.host
-        print("mentor reuests keys")
-        print(mentor_requests.keys())
+
         if id in mentor_requests.keys():
             requestList = mentor_requests[id]
         else:
             requestList = []
+
         self.render('mentor.html', _id=id, requestList=requestList)
 
 if __name__ == "__main__":
