@@ -186,8 +186,17 @@ class requestQueue(RequestHandler):
         else:
             requestList = []
 
+        request_json = []
+        for request in requestList:
+            req_dict = {}
+            req_dict['id'] = request[0]
+            req_dict['subject'] = request[1]
+            req_dict['time'] = request[2]
+            req_dict['text'] = request[3]
+            req_dict['loc'] = request[4]
+            request_json.append(req_dict)
 
-        self.render('mentor.html', _id=id, requestList=requestList)
+        self.render('mentor.html', _id=id, requestList=request_json)
 
 if __name__ == "__main__":
     handler_mapping = [

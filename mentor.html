@@ -1,4 +1,4 @@
-{% extends 'layout.html' %} 
+{% extends 'layout.html' %}
 
 {% block scripts %}
 
@@ -11,11 +11,14 @@
 
       // get an initial list of open request relevant to that mentor
       var requestList = "{{ requestList }}"
+      var find = '&#39;';
+      var re = new RegExp(find, 'g');
+      requestList = requestList.replace(re, '');
       console.log(requestList)
 
       // open the web socket connection for more requests
       var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
-      
+
       ws.onopen = function() {
         console.log('mentor connection opened.');
       };
