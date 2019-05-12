@@ -7,14 +7,13 @@
         return document.getElementById(id);
       };
       var urlParams = new URLSearchParams(window.location.search);
-      var id = urlParams.getAll('id')[0]
+      var id = urlParams.getAll('_id')[0]
 
       // get an initial list of open request relevant to that mentor
       var requestList = "{{ requestList }}"
       var find = '&#39;';
       var re = new RegExp(find, 'g');
-      requestList = requestList.replace(re, '');
-      console.log(requestList)
+      requestList = requestList.replace(re, '"');
 
       // open the web socket connection for more requests
       var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
@@ -27,6 +26,8 @@
         requestList = evt.data
       };
 
+      var jsonObj = JSON.parse(requestList);
+
     </script>
 
 
@@ -37,6 +38,24 @@ h2 {
   font-size: 3em;
 }
 
+.button {
+  background-color: white;
+  border: 2px solid #4CAF50;
+  color: blue;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
   </style>
 
 {% end %}
@@ -45,12 +64,62 @@ h2 {
 
   <body>
 
-    <div class="col-sm-4">
+    <div id="welcome" class="col-sm-4">
       <br>
       <br>
         <h2> Hey Mentor, here are tutoring requests in your area : </h2>
 
     </div>
+
+    <ul id="list">
+    </ul>
+
+    <script>
+
+      for(i=0; i<jsonObj.length; i++) {
+        var node = document.createElement("LI");
+        addElement(jsonObj[i]);
+        addButton(jsonObj[i]["id"]);
+        document.body.appendChild(node);
+      }
+
+      function addElement (req) {
+        var subject = document.createTextNode("\n Subject: " + req["subject"]);
+        var lb1 = document.createElement("br")
+        var time = document.createTextNode("\n Estimated time: " + req["time"]);
+        var lb2 = document.createElement("br")
+        var text = document.createTextNode("\n (Optional) Additional Info: " + req["text"]);
+        var lb3 = document.createElement("br")
+        var loc = document.createTextNode("\n Location (map soon to come!): " + req["loc"]);
+        var lb4 = document.createElement("br")
+        node.appendChild(subject);
+        node.appendChild(lb1);
+        node.appendChild(time);
+        node.appendChild(lb2);
+        node.appendChild(text);
+        node.appendChild(lb3);
+        node.appendChild(loc);
+        node.appendChild(lb4)
+      }
+
+      function addButton(req_id) {
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var id = urlParams.getAll('_id')[0]
+
+        var form = document.createElement("form")
+        form.setAttribute("method", "POST")
+        form.setAttribute("action", "/acceptRequest?_id="+id+"&request_id="+req_id)
+
+        var button = document.createElement("button")
+        button.setAttribute("type", "submit")
+        button.setAttribute("class", "button")
+
+        form.appendChild(button)
+        node.appendChild(form)
+      }
+
+    </script>
 
 
 

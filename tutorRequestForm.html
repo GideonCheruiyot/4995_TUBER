@@ -15,16 +15,16 @@ h2 {
       };
 
       var urlParams = new URLSearchParams(window.location.search);
-      var id = urlParams.getAll('id')[0]
+      var id = urlParams.getAll('_id')[0]
 
       var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
-      
+
       ws.onopen = function() {
         console.log('opened.');
       };
 
 
-     
+
       ws.onmessage = function (evt) {
        alert(evt.data);
       };
@@ -138,7 +138,7 @@ h2 {
 
             <input hidden type="text" id="lon" name="lon" value="0">
             <input hidden type="text" id="lat" name="lat" value="0">
-            <input hidden type="hidden" name="_id" value="{{ _id }}"> 
+            <input hidden type="hidden" name="_id" value="{{ _id }}">
             <input type="submit" value="Submit Tutor Request" class="btn btn-primary  mt-4 mb-4" style="width:100%">
   </form>
 

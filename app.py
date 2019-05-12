@@ -112,15 +112,14 @@ class getMentors(RequestHandler):
 
         requests[requestIdGenerator] = []
         for mentor in results:
-            if mentor['_id'] in mentor_requests.keys():
-                mentor_requests[mentor['_id']].append((requestIdGenerator, subject, time, message, student_location))
+            mentor_id = int(mentor['_id'])
+            if mentor_id in mentor_requests.keys():
+                mentor_requests[mentor_id].append((requestIdGenerator, subject, time, message, student_location))
             else:
-                mentor_requests[mentor['_id']] = [(requestIdGenerator, subject, time, message, student_location)]
-            requests[requestIdGenerator].append(mentor['_id'])
+                mentor_requests[mentor_id] = [(requestIdGenerator, subject, time, message, student_location)]
+            requests[requestIdGenerator].append(mentor_id)
 
         requestIdGenerator += 1
-        print(results)
-        print(mentor_requests)
 
         self.redirect('/wait?request_id=' + str(requestIdGenerator - 1) + '&_id=' + str(id))
 
@@ -138,8 +137,9 @@ class acceptRequest(RequestHandler):
     def post(self):
         global requests
         global mentor_requests
-        id = self.get_body_argument('_id')
+        id = self.get_argument('_id')
         request_id = self.get_argument('request_id')
+        request_id = int(request_id)
         releventMentors = requests[request_id]
 
         # update the individual list of relevant requests for each mentor
@@ -151,7 +151,8 @@ class acceptRequest(RequestHandler):
         # send message to all relevant mentor to update their request lists
         for mentor in releventMentors:
             if mentor != id:
-                opened_sockets[mentor].on_message(mentor_requests[mentor])
+                if(mentor in opened_sockets):
+                    opened_sockets[mentor].on_message(mentor_requests[mentor])
 
         self.redirect('/match?_id=' + str(id))
 

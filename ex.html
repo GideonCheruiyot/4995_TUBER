@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% block scripts %}
+
+    <script>
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+      var urlParams = new URLSearchParams(window.location.search);
+      var id = urlParams.getAll('_id')[0]
+
+      // get an initial list of open request relevant to that mentor
+      var requestList = "{{ requestList }}"
+      var find = '&#39;';
+      var re = new RegExp(find, 'g');
+      requestList = requestList.replace(re, '');
+      console.log(requestList);
+
+      // open the web socket connection for more requests
+      var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
+
+      ws.onopen = function() {
+        console.log('mentor connection opened.');
+      };
+
+      ws.onmessage = function (evt) {
+        requestList = evt.data
+      };
+
+      var jsonObj = JSON.parse(requestList);
+      
+      function makeUL(json) {
+              // Create the list element:
+              var list = document.createElement('ul');
+              for(var i = 0; i < Object.keys(json).length; i++) {
+                  // Create the list item:
+                  var item = document.createElement('li');
+                  // Set its contents:
+                  item.appendChild(document.createTextNode(Object.values(json)[i]));
+                  // Add it to the list:
+                  list.appendChild(item);
+              }
+              // Finally, return the constructed list:
+              return list;
+          }
+          // Add the contents of json to #foo:
+          document.getElementById('foo').appendChild(makeUL(json));
+
+    </script>
+
+  <style>
+h2 {
+  text-align: center;
+  font-weight: 100;
+  font-size: 3em;
+}
+
+  </style>
+
+{% end %}
+{% block content %}
+
+
+  <body>
+
+    <div class="col-md-12">
+      <br>
+      <br>
+        <h2> Hey Mentor, here are tutoring requests in your area : </h2>
+
+        <div class="jumbotron text-center">
+  <h1>Tutoring requests</h1>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-4">
+      <h3>ID</h3>
+      <p>Some info</p>
+      <p>Some info</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>Subjects</h3>
+      <p>Some info</p>
+      <p>Some info</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>Location</h3>
+      <p>Some info</p>
+      <p>Some info</p>
+    </div>
+  </div>
+</div>
+
+        <div id="foo"></div>
+
+    </div>
+
+
+
+  </body>
+
+{% end %}
