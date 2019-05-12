@@ -1,0 +1,87 @@
+{% extends 'layout.html' %} 
+
+{% block scripts %}
+
+<script type="text/javascript">
+  var locations = [
+  ['Bondi Beach', -33.890542, 151.274856, 4],
+  ['Coogee Beach', -33.923036, 151.259052, 5],
+  ['Cronulla Beach', -34.028249, 151.157507, 3],
+  ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
+  ['Maroubra Beach', -33.950198, 151.259302, 1]
+];
+var map;
+var markers = [];
+
+function init(){
+  map = new google.maps.Map(document.getElementById('map_canvas'), {
+    zoom: 10,
+    center: new google.maps.LatLng(-33.92, 151.25),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+
+  var num_markers = locations.length;
+  for (var i = 0; i < num_markers; i++) {  
+    markers[i] = new google.maps.Marker({
+      position: {lat:locations[i][1], lng:locations[i][2]},
+      map: map,
+      html: locations[i][0],
+      id: i,
+    });
+      
+    google.maps.event.addListener(markers[i], 'click', function(){
+      var infowindow = new google.maps.InfoWindow({
+        id: this.id,
+        content:this.html,
+        position:this.getPosition()
+      });
+      google.maps.event.addListenerOnce(infowindow, 'closeclick', function(){
+        markers[this.id].setVisible(true);
+      });
+      this.setVisible(false);
+      infowindow.open(map);
+    });
+  }
+}
+
+init();
+
+</script>
+
+  <style>
+h2 {
+  text-align: center;
+  font-weight: 100;
+  font-size: 3em;
+}
+#map_canvas { 
+  border:1px solid black;
+  height: 400px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+
+  </style>
+
+{% end %}
+{% block content %}
+
+
+  <body>
+    <div 
+    <div class="col-md-12">
+      <br>
+      <br>
+        <h2> Hey Student, please accept your mentor below: </h2>
+
+        
+    </div>
+    <div class = "row">
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<div id="map_canvas"></div>
+</div>
+
+    
+  </body>
+{% end %}
