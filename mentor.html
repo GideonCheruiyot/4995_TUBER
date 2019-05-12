@@ -9,22 +9,20 @@
       var urlParams = new URLSearchParams(window.location.search);
       var id = urlParams.getAll('id')[0]
 
+      // get an initial list of open request relevant to that mentor
+      var requestList = "{{ requestList }}"
+      console.log(requestList)
+
+      // open the web socket connection for more requests
       var ws = new WebSocket("ws://localhost:7777/matcherNotifications/" + id);
       
       ws.onopen = function() {
         console.log('mentor connection opened.');
       };
 
-      //get the initial list of open requests
-      function getOpenRequests (id) {
-        var request = new ()
-          
-
-
-      } 
-     
       ws.onmessage = function (evt) {
        alert(evt.data);
+
       };
 
 

@@ -19,7 +19,6 @@ cache = db.mentor_cache
 IP_to_id_map = {}
 mentor_requests = {}
 opened_sockets = {}
-active_requests = {}
 
 class logIn(RequestHandler):
 
@@ -53,11 +52,15 @@ class sendMessage(RequestHandler):
         for os in list(opened_sockets.keys()):
             opened_sockets[os].on_message('Annie')
 
+class sendMessage(RequestHandler):
+    def get(self):
+        for os in list(opened_sockets.keys()):
+            opened_sockets[os].on_message('Annie')
+
 class matcherNotifications(WebSocketHandler):
     def open(self, id):
         opened_sockets[id] = self
-        print('Connection Established.')
-        print(opened_sockets)
+        # print('Connection Established.')
 
     def on_message(self, message):
         self.write_message(u"You said: " + message)
@@ -65,7 +68,6 @@ class matcherNotifications(WebSocketHandler):
     def on_close(self):
         # close the connection
         # matcherNotifications.opened_sockets.remove(self) 
-        print('s')
         pass
 
 	# @classmethod
@@ -89,14 +91,14 @@ class getMentors(RequestHandler):
     # queries the database for potential matches and returns them
     def post(self):
         IP = self.request.host
+        id = self.get_body_argument('_id')
         subject = self.get_body_argument('subject')
         time  = self.get_body_argument('time')
         message  = self.get_body_argument('message')
-        lon = self.get_body_argument('lon')
-        lat = self.get_body_argument('lat')
-        
-        # lon = -73.91207225
-        # lat = 40.71497363
+        # lon = self.get_body_argument('lon')
+        # lat = self.get_body_argument('lat')
+        lon = -70        
+        lat = 43
 
         student_location = [float(lon), float(lat)]
         query = {"loc": SON([("$near", student_location),
@@ -109,7 +111,12 @@ class getMentors(RequestHandler):
             results.append(res)
         
         for mentor in results:
-            mentor_requests[mentor["_id"]] = (subject, time, message)
+            if mentor['_id'] in mentor_requests.keys():
+                mentor_requests[mentor['_id']].append((subject, time, message, student_location))      
+            else:
+                mentor_requests[mentor['_id']] = [(subject, time, message, student_location)]
+
+        print(results)
         print(mentor_requests)
 
         self.redirect('/wait?id=' + str(id))
@@ -122,16 +129,15 @@ class wait(RequestHandler):
 
 class switchViews(RequestHandler):
 
-    def get(self):
-        to_which = self.get_argument('to_which')
-        id = self.get_argument('id')
+    # removes the IP from the active cache if switching from mentor to student
+    def post(self):
+        to_which = self.get_body_argument('to_which')
+        id = self.get_body_argument('_id')
         if to_which == 'student':
             IP_to_id_map.pop(id, None)
-            self.redirect('/getMentors?=id' + str(id))
+            self.redirect('/getMentors?id=' + str(id))
         else:
-            IP_to_id_map[id] = self.request.host
-
-            self.redirect('/requestQueue?=id' + str(id))
+            self.redirect('/requestQueue?id=' + str(id))
 
 class requestQueue(RequestHandler):
 
@@ -140,7 +146,13 @@ class requestQueue(RequestHandler):
     def get(self):
         id = self.get_argument('id')
         IP_to_id_map[id] = self.request.host
-        self.render('mentor.html', _id=id)
+        print("mentor reuests keys")
+        print(mentor_requests.keys())
+        if id in mentor_requests.keys():
+            requestList = mentor_requests[id]
+        else:
+            requestList = []
+        self.render('mentor.html', _id=id, requestList=requestList)
 
 if __name__ == "__main__":
     handler_mapping = [
