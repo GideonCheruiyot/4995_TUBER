@@ -63,13 +63,13 @@ class matcherNotifications(WebSocketHandler):
 
     def on_close(self):
         # close the connection
-        # matcherNotifications.opened_sockets.remove(self) 
+        # matcherNotifications.opened_sockets.remove(self)
         pass
 
 	# @classmethod
 	# def notify_mentors(cls):
-	# 	# get the ip addesses of the intersection of the connected users and the 
-		
+	# 	# get the ip addesses of the intersection of the connected users and the
+
 
 
 # for the request service search radius: radius: ~1 mile = .017 units
@@ -87,6 +87,9 @@ class getMentors(RequestHandler):
     # fetches the student IP and the content of the request
     # queries the database for potential matches and returns them
     def post(self):
+        global requestIdGenerator
+        global mentor_requests
+        global requests
         IP = self.request.host
         id = self.get_body_argument('_id')
         subject = self.get_body_argument('subject')
@@ -94,7 +97,7 @@ class getMentors(RequestHandler):
         message  = self.get_body_argument('message')
         # lon = self.get_body_argument('lon')
         # lat = self.get_body_argument('lat')
-        lon = -70        
+        lon = -70
         lat = 43
 
         student_location = [float(lon), float(lat)]
@@ -106,14 +109,14 @@ class getMentors(RequestHandler):
 
         for res in prelim:
             results.append(res)
-        
+
         requests[requestIdGenerator] = []
         for mentor in results:
             if mentor['_id'] in mentor_requests.keys():
                 mentor_requests[mentor['_id']].append((requestIdGenerator, subject, time, message, student_location))
             else:
                 mentor_requests[mentor['_id']] = [(requestIdGenerator, subject, time, message, student_location)]
-            requests[requestIdGenerator].append(mentor['_id'])      
+            requests[requestIdGenerator].append(mentor['_id'])
 
         requestIdGenerator += 1
         print(results)
@@ -133,21 +136,23 @@ def updateRequestList(request_id):
 class acceptRequest(RequestHandler):
 
     def post(self):
+        global requests
+        global mentor_requests
         id = self.get_body_argument('_id')
         request_id = self.get_argument('request_id')
         releventMentors = requests[request_id]
-        
+
         # update the individual list of relevant requests for each mentor
         updateRequestList(request_id)
 
         # remove request from the list of open requests
         requests.pop(request_id)
-        
+
         # send message to all relevant mentor to update their request lists
         for mentor in releventMentors:
             if mentor != id:
                 opened_sockets[mentor].on_message(mentor_requests[mentor])
-        
+
         self.redirect('/match?_id=' + str(id))
 
 class wait(RequestHandler):
@@ -172,6 +177,7 @@ class requestQueue(RequestHandler):
     # renders the page with the id in
     # the navigation bar and adds the mentor to the active cache
     def get(self):
+        global mentor_requests
         id = int(self.get_argument('_id'))
         IP_to_id_map[id] = self.request.host
 
