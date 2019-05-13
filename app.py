@@ -91,7 +91,7 @@ class getMentors(RequestHandler):
         global mentor_requests
         global requests
         IP = self.request.host
-        id = self.get_body_argument('_id')
+        studentId = self.get_body_argument('_id')
         subject = self.get_body_argument('subject')
         time  = self.get_body_argument('time')
         message  = self.get_body_argument('message')
@@ -112,14 +112,15 @@ class getMentors(RequestHandler):
 
         requests[requestIdGenerator] = []
         for mentor in results:
-            mentor_id = int(mentor['_id'])
-            if mentor_id in mentor_requests.keys():
-                mentor_requests[mentor_id].append((requestIdGenerator, subject, time, message, student_location))
+            if mentor['_id'] in mentor_requests.keys():
+                mentor_requests[mentor['_id']].append((requestIdGenerator, subject, time, message, student_location, studentId))
             else:
-                mentor_requests[mentor_id] = [(requestIdGenerator, subject, time, message, student_location)]
-            requests[requestIdGenerator].append(mentor_id)
+                mentor_requests[mentor['_id']] = [(requestIdGenerator, subject, time, message, student_location, studentId)]
+            requests[requestIdGenerator].append(mentor['_id'])
 
         requestIdGenerator += 1
+        print(results)
+        print(mentor_requests)
 
         self.redirect('/wait?request_id=' + str(requestIdGenerator - 1) + '&_id=' + str(id))
 
@@ -129,21 +130,24 @@ def updateRequestList(request_id):
         listRequests = mentor_requests[r]
         for req in listRequests:
             if req[0] == request_id:
+                loc = req[4]
                 listRequests.remove(req)
         mentor_requests[r] = listRequests
+
+    return loc
 
 class acceptRequest(RequestHandler):
 
     def post(self):
         global requests
         global mentor_requests
-        id = self.get_argument('_id')
+        mentorId = self.get_body_argument('_id')
         request_id = self.get_argument('request_id')
-        request_id = int(request_id)
+        studentId = mentor_requests[mentorId][5]
         releventMentors = requests[request_id]
 
-        # update the individual list of relevant requests for each mentor
-        updateRequestList(request_id)
+        # update the individual list of relevant requests for each mentor and return location
+        loc = updateRequestList(request_id)
 
         # remove request from the list of open requests
         requests.pop(request_id)
@@ -151,27 +155,39 @@ class acceptRequest(RequestHandler):
         # send message to all relevant mentor to update their request lists
         for mentor in releventMentors:
             if mentor != id:
-                if(mentor in opened_sockets):
-                    opened_sockets[mentor].on_message(mentor_requests[mentor])
+                opened_sockets[mentor].on_message(mentor_requests[mentor])
 
-        self.redirect('/match?_id=' + str(id))
+        # query database for the mentor's name and phone number
+        query = {'_id':mentorId}
+        result = user_info.find_one(query)
+        mentorName = result['name']
+        mentorPhone = result['phone_no']
+
+        # query database for the student's name and phone number
+        query = {'_id':studentId}
+        result = user_info.find_one(query)
+        stuName = result['name']
+        stuPhone = result['phone_no']
+
+        # send message to student to render the information page
+        opened_sockets[studentId].on_message([mentorName, mentorPhone])
+
+        # redirect the mentor to the match page
+        self.redirect('/matchMentor?stuName=' + stuName + '&stuPhone=' + stuPhone + '&loc=' + loc)
+
 
 class wait(RequestHandler):
 
     def get(self):
         self.render('wait.html')
 
-class switchViews(RequestHandler):
+class matchMentor(RequestHandler):
+    def get(self):
+        stuName = self.get_argument('stuName')
+        stuPhone = self.get_argument('stuPhone')
+        loc = self.get_argument('loc')
+        self.render('matchMentor.html', stuName=stuName, stuPhone=stuPhone, loc=loc)
 
-    # removes the IP from the active cache if switching from mentor to student
-    def post(self):
-        to_which = self.get_body_argument('to_which')
-        id = self.get_body_argument('_id')
-        if to_which == 'student':
-            IP_to_id_map.pop(id, None)
-            self.redirect('/getMentors?_id=' + str(id))
-        else:
-            self.redirect('/requestQueue?_id=' + str(id))
 
 class requestQueue(RequestHandler):
 
@@ -199,6 +215,31 @@ class requestQueue(RequestHandler):
 
         self.render('mentor.html', _id=id, requestList=request_json)
 
+class matchMentor(RequestHandler):
+    def get(self):
+        stuName = self.get_argument('stuName')
+        stuPhone = self.get_argument('stuPhone')
+        loc = self.get_argument('loc')
+        self.render('matchMentor.html', stuName=stuName, stuPhone=stuPhone, loc=loc)
+
+class matchStudent(RequestHandler):
+    def get(self):
+
+        print("worked")
+        # self.render('matchStudent.html', )
+
+class switchViews(RequestHandler):
+
+    # removes the IP from the active cache if switching from mentor to student
+    def post(self):
+        to_which = self.get_body_argument('to_which')
+        id = self.get_body_argument('_id')
+        if to_which == 'student':
+            IP_to_id_map.pop(id, None)
+            self.redirect('/getMentors?_id=' + str(id))
+        else:
+            self.redirect('/requestQueue?_id=' + str(id))
+
 if __name__ == "__main__":
     handler_mapping = [
                        (r'/logIn', logIn),
@@ -208,7 +249,9 @@ if __name__ == "__main__":
                        (r'/sendMessage', sendMessage),
 					   (r'/matcherNotifications/(.*)', matcherNotifications),
                        (r'/requestQueue', requestQueue),
-                       (r'/acceptRequest', acceptRequest)
+                       (r'/acceptRequest', acceptRequest),
+                       (r'/matchStudent', matchStudent),
+                       (r'/matchMentor', matchMentor)
                       ]
     application = Application(handler_mapping)
     application.listen(7777)
