@@ -1,6 +1,4 @@
-
-
-<html>
+u<html>
   <script>
     //make an api call to the backend that will render 
     var urlParams = new URLSearchParams(window.location.search);
@@ -15,9 +13,12 @@
 
     ws.onmessage = function (evt) {
         data = evt.data
- 
-
-        
+        mentorName = data[0]
+        mentorPhone = data[1]
+        var request = new XMLHttpRequest()
+        url = 'http://localhost:7777/matchStudent?mentorName=' + mentorName + '&mentorPhone=' + mentorPhone
+        request.open('GET', url, true)
+        request.send()
       };
 
    </script>
