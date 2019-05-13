@@ -59,7 +59,7 @@ class matcherNotifications(WebSocketHandler):
         # print('Connection Established.')
 
     def on_message(self, message):
-        self.write_message(u"You said: " + message)
+        self.write_message(u"You said: " + str(message))
 
     def on_close(self):
         # close the connection
@@ -141,9 +141,10 @@ class acceptRequest(RequestHandler):
     def post(self):
         global requests
         global mentor_requests
-        mentorId = self.get_body_argument('_id')
-        request_id = self.get_argument('request_id')
-        studentId = mentor_requests[mentorId][5]
+        mentorId = int(self.get_argument('_id'))
+        request_id = int(self.get_argument('request_id'))
+
+        studentId = int(mentor_requests[mentorId][0][5])
         releventMentors = requests[request_id]
 
         # update the individual list of relevant requests for each mentor and return location
@@ -155,25 +156,42 @@ class acceptRequest(RequestHandler):
         # send message to all relevant mentor to update their request lists
         for mentor in releventMentors:
             if mentor != id:
-                opened_sockets[mentor].on_message(mentor_requests[mentor])
+                print("lauren's mr")
+                print(mentor_requests)
+                print(mentor)
+                print("sockets")
+                print(opened_sockets)
+                opened_sockets['8'].on_message(mentor_requests[int(mentor)])
 
         # query database for the mentor's name and phone number
         query = {'_id':mentorId}
+
         result = user_info.find_one(query)
+
+
+
+
         mentorName = result['name']
-        mentorPhone = result['phone_no']
+        mentorPhone = result['phone']
 
         # query database for the student's name and phone number
         query = {'_id':studentId}
+
         result = user_info.find_one(query)
+
+
         stuName = result['name']
-        stuPhone = result['phone_no']
+        
+        stuPhone = result['phone']
 
         # send message to student to render the information page
-        opened_sockets[studentId].on_message([mentorName, mentorPhone])
+        opened_sockets[str(studentId)].on_message([mentorName, mentorPhone])
+
+
+
 
         # redirect the mentor to the match page
-        self.redirect('/matchMentor?stuName=' + stuName + '&stuPhone=' + stuPhone + '&loc=' + loc)
+        self.redirect('/matchMentor?stuName=' + stuName + '&stuPhone=' + stuPhone + '&loc=' + str(loc) + '&_id=' + str(studentId) )
 
 
 class wait(RequestHandler):
@@ -186,7 +204,8 @@ class matchMentor(RequestHandler):
         stuName = self.get_argument('stuName')
         stuPhone = self.get_argument('stuPhone')
         loc = self.get_argument('loc')
-        self.render('matchMentor.html', stuName=stuName, stuPhone=stuPhone, loc=loc)
+        _id = self.get_argument('_id')
+        self.render('mentor-final.html', stuName=stuName, stuPhone=stuPhone, loc=loc, _id=_id)
 
 
 class requestQueue(RequestHandler):
@@ -215,12 +234,6 @@ class requestQueue(RequestHandler):
 
         self.render('mentor.html', _id=id, requestList=request_json)
 
-class matchMentor(RequestHandler):
-    def get(self):
-        stuName = self.get_argument('stuName')
-        stuPhone = self.get_argument('stuPhone')
-        loc = self.get_argument('loc')
-        self.render('matchMentor.html', stuName=stuName, stuPhone=stuPhone, loc=loc)
 
 class matchStudent(RequestHandler):
     def get(self):
