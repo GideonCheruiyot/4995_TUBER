@@ -199,8 +199,8 @@ class acceptRequest(RequestHandler):
 class wait(RequestHandler):
 
     def get(self):
-        #self.render('wait.html')
-        self.render('student-final.html',_id=0)
+        self.render('wait.html')
+        #self.render('student-final.html',_id=0)
 
 
 
