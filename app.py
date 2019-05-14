@@ -58,8 +58,11 @@ class matcherNotifications(WebSocketHandler):
         opened_sockets[id] = self
         # print('Connection Established.')
 
-    def on_message(self, message):
-        self.write_message(u"You said: " + str(message))
+    def on_message(self,message):
+        print("hey")
+        #if len(message) == 2:
+        #self.redirect('/matchMentor?stuName=' + stuName + '&stuPhone=' + stuPhone + '&loc=' + str(loc) + '&_id=' + str(studentId) )
+            #wait.post(message)
 
     def on_close(self):
         # close the connection
@@ -119,8 +122,6 @@ class getMentors(RequestHandler):
             requests[requestIdGenerator].append(mentor['_id'])
 
         requestIdGenerator += 1
-        print(results)
-        print(mentor_requests)
 
         self.redirect('/wait?request_id=' + str(requestIdGenerator - 1) + '&_id=' + str(id))
 
@@ -153,14 +154,13 @@ class acceptRequest(RequestHandler):
         # remove request from the list of open requests
         requests.pop(request_id)
 
+        print("relment")
+
+        print(releventMentors)
+
         # send message to all relevant mentor to update their request lists
         for mentor in releventMentors:
             if mentor != id:
-                print("lauren's mr")
-                print(mentor_requests)
-                print(mentor)
-                print("sockets")
-                print(opened_sockets)
                 opened_sockets['8'].on_message(mentor_requests[int(mentor)])
 
         # query database for the mentor's name and phone number
@@ -184,8 +184,10 @@ class acceptRequest(RequestHandler):
         
         stuPhone = result['phone']
 
+
+
         # send message to student to render the information page
-        opened_sockets[str(studentId)].on_message([mentorName, mentorPhone])
+        opened_sockets[str(studentId)].on_message([mentorName,mentorPhone])
 
 
 
@@ -197,7 +199,11 @@ class acceptRequest(RequestHandler):
 class wait(RequestHandler):
 
     def get(self):
-        self.render('wait.html')
+        #self.render('wait.html')
+        self.render('student-final.html',_id=0)
+
+
+
 
 class matchMentor(RequestHandler):
     def get(self):
@@ -234,12 +240,15 @@ class requestQueue(RequestHandler):
 
         self.render('mentor.html', _id=id, requestList=request_json)
 
-
 class matchStudent(RequestHandler):
-    def get(self):
+    def get(self,message):
 
-        print("worked")
-        # self.render('matchStudent.html', )
+        print(message)
+
+        
+
+    def go(self,message):
+        print(message)
 
 class switchViews(RequestHandler):
 
