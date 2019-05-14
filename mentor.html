@@ -1,8 +1,11 @@
 {% extends 'layout.html' %}
 
 {% block scripts %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvaaks1qGwjB2o5lS6U9o43mPLFMSqHFM"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
     <script>
+
       var $ = function (id) {
         return document.getElementById(id);
       };
@@ -28,6 +31,51 @@
 
       var jsonObj = JSON.parse(requestList);
 
+      ///your locations array 
+///your locations array 
+var locations = [
+  ['Student', 40.75, -73.986, 5]
+];
+
+var map;
+var markers = [];
+
+function init()
+{
+  map = new google.maps.Map(document.getElementById('map'), {
+  zoom: 8,
+  center: new google.maps.LatLng(40.75, -73.986),
+  mapTypeId: google.maps.MapTypeId.ROADMAP
+  });
+
+  var num_markers = locations.length;
+  for (var i = 0; i < num_markers; i++) {  // alert(locations[i][1]+'===='+locations[i][2]+'=='+locations[i][0]);
+  markers[i] = new google.maps.Marker({
+    position: {lat:locations[i][1], lng:locations[i][2]},
+    map: map,
+    html: locations[i][0],
+    id: i,
+  });
+
+  google.maps.event.addListener(markers[i], 'click', function(){
+    var infowindow = new google.maps.InfoWindow({
+    id: this.id,
+    content:this.html,
+    position:this.getPosition()
+    });
+    google.maps.event.addListenerOnce(infowindow, 'closeclick', function(){
+    markers[this.id].setVisible(true);
+    });
+    this.setVisible(false);
+    infowindow.open(map);
+  });
+  }
+  
+}
+
+
+  google.maps.event.addDomListener(window, 'load', init); 
+
     </script>
 
 
@@ -36,6 +84,10 @@ h2 {
   text-align: center;
   font-weight: 100;
   font-size: 3em;
+}
+#map{
+  position: absolute;
+  bottom: 0;
 }
 
 .button {
@@ -63,16 +115,26 @@ h2 {
 
 
   <body>
-
-    <div id="welcome" class="col-sm-4">
+    <div class= "row">
+    <div id="welcome" class="col-md-12">
       <br>
       <br>
         <h2> Hey Mentor, here are tutoring requests in your area : </h2>
 
     </div>
-
+    <div id = "ll"  class= "col-md-6">
+      <h2> Results: </h2>
     <ul id="list">
     </ul>
+  </div>
+  <br>
+  </div>
+<footer>
+      <div id = "mp" class = "col-md-6">
+<div id="map" class = "d-flex flex-column justify-content-between" style="width: 150px; height: 50%; padding-left:400px;"></div>
+  </div>
+</footer>
+
 
     <script>
 
@@ -85,21 +147,31 @@ h2 {
 
       function addElement (req) {
         var subject = document.createTextNode("\n Subject: " + req["subject"]);
-        var lb1 = document.createElement("br")
+        var lb1 = document.createElement("br");
         var time = document.createTextNode("\n Estimated time: " + req["time"]);
-        var lb2 = document.createElement("br")
+        var lb2 = document.createElement("br");
         var text = document.createTextNode("\n (Optional) Additional Info: " + req["text"]);
         var lb3 = document.createElement("br")
         var loc = document.createTextNode("\n Location (map soon to come!): " + req["loc"]);
-        var lb4 = document.createElement("br")
+        console.log(typeof(req["loc"]));
+        console.log(req["loc"]);
+        var lb4 = document.createElement("br");
+        var lb5 = document.createElement("br");
+        var lb6 = document.createElement("br");
+        var lb7 = document.createElement("br");
+        var lb8 = document.createElement("br");
         node.appendChild(subject);
         node.appendChild(lb1);
+        node.appendChild(lb5);
         node.appendChild(time);
         node.appendChild(lb2);
+        node.appendChild(lb6);
         node.appendChild(text);
         node.appendChild(lb3);
+        node.appendChild(lb7);
         node.appendChild(loc);
-        node.appendChild(lb4)
+        node.appendChild(lb4);
+        node.appendChild(lb8);
       }
 
       function addButton(req_id) {
@@ -107,13 +179,17 @@ h2 {
         var urlParams = new URLSearchParams(window.location.search);
         var id = urlParams.getAll('_id')[0]
 
-        var form = document.createElement("form")
-        form.setAttribute("method", "POST")
-        form.setAttribute("action", "/acceptRequest?_id="+id+"&request_id="+req_id)
+        var form = document.createElement("form");
+        form.setAttribute("method", "POST");
+        form.setAttribute("action", "/acceptRequest?_id="+id+"&request_id="+req_id);
 
         var button = document.createElement("button")
-        button.setAttribute("type", "submit")
-        button.setAttribute("class", "button")
+        button.setAttribute("type", "submit");
+        button.setAttribute('class', 'button');
+        button.innerHTML = 'Submit';
+        
+       
+
 
         form.appendChild(button)
         node.appendChild(form)

@@ -2,52 +2,22 @@
 
 {% block scripts %}
 
-<script type="text/javascript">
-  var locations = [
-  ['Bondi Beach', -33.890542, 151.274856, 4],
-  ['Coogee Beach', -33.923036, 151.259052, 5],
-  ['Cronulla Beach', -34.028249, 151.157507, 3],
-  ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
-  ['Maroubra Beach', -33.950198, 151.259302, 1]
-];
-var map;
-var markers = [];
-
-function init(){
-  map = new google.maps.Map(document.getElementById('map_canvas'), {
-    zoom: 10,
-    center: new google.maps.LatLng(-33.92, 151.25),
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  });
-
-  var num_markers = locations.length;
-  for (var i = 0; i < num_markers; i++) {  
-    markers[i] = new google.maps.Marker({
-      position: {lat:locations[i][1], lng:locations[i][2]},
-      map: map,
-      html: locations[i][0],
-      id: i,
-    });
-      
-    google.maps.event.addListener(markers[i], 'click', function(){
-      var infowindow = new google.maps.InfoWindow({
-        id: this.id,
-        content:this.html,
-        position:this.getPosition()
-      });
-      google.maps.event.addListenerOnce(infowindow, 'closeclick', function(){
-        markers[this.id].setVisible(true);
-      });
-      this.setVisible(false);
-      infowindow.open(map);
-    });
-  }
-}
-
-init();
 
 </script>
+<script type="text/javascript">
+  window.onload = function(){
 
+var stuName = "{{ stuName }}";
+var stuPhone = "{{ stuPhone }}";
+var loc = "{{ loc }}";
+var _id= "{{ _id }}";
+document.getElementById('loc').innerHTML = _id;
+document.getElementById('phone').innerHTML = stuPhone;
+document.getElementById('name').innerHTML = stuName;
+document.getElementById('loc').innerHTML = loc;
+}
+
+</script>
   <style>
 h2 {
   text-align: center;
@@ -73,48 +43,38 @@ h2 {
     <div class="col-md-12">
       <br>
       <br>
-        <h2> Hey Mentor, please accept a student below: </h2>
+        <h2> Hey Mentor, please contact the student below: </h2>
 
-      <div id = "student_name" class="name col-md-3">
-        <p>Student Name</p>
-        <div>
+      <div id = "student_name" class="name col-md-6">
+        <h3>Student Name: </h3>
+        </div>
+         <div id = "name"></div>
+
         <br>
 
-      <div id = "student_phone" class="phone col-md-3">
-        <p>Student Phone Number</p>
-        <div>
+      <div id = "student_phone" class="phone col-md-6">
+        <h3>Student Phone Number: </h3>
+                      <div id = "phone"> </div>
+        </div>
+
         <br>
 
-      <div id = "student_loc" class="loc col-md-3">
-        <p>Student Location</p>
-        <div>
+      <div id = "student_loc" class="loc col-md- 6">
+        <h3>Student Location: </h3>
+              <div id = "loc" > </div>
+         </div>
         <br>
 
-      <div id = "subject" class="sub col-md-3">
-        <p>Subject</p>
-        <div>
+  <!--     <div id = "subject" class="sub col-md-6">
+        <h3>Subject : </h3>
+              <div id = "subj"></div>
+        </div>
         <br>
+            
+        <br> -->
 
-      <div id = "time" class="time col-md-3">
-        <p>Duration</p>
-        <div>
-        <br>
-
-      <div id = "text" class="text col-md-3">
-        <p>Optional Text</p>
-        <div>
-        <br>
-        
-    </div>
 
     <br>
     <br>
-
-    <div class = "row">
-    <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<div id="map_canvas"></div>
-</div>
-
-    
   </body>
 {% end %}
