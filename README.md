@@ -1,8 +1,9 @@
-# 4995_TUBER
-TUBER is a web application that allows students to request on-demand tutoring help from nearby students. 
+# NLP Frequency Analysis
+
+NLP Frequency Analysis is a web application that a user to upload a file and view how often the 25 words are used in it. The user can also analyse the previous ten submissions with frequency analyses data (original text, stop words setting, and resulting word frequencies).
 
 # Overview
-TUBER allows the user to login to their account, switch between the mentor (tutor) and the student view, request mentors and view/accept requests for tutoring sessions in your area. The application also supports periodic location updates in the database for the tutors to provide up-to-date matching based on geographic proximity.
+NLP Frequency Analysis switch between the FrequencyCount view and FrequencyAnalysis view using a navigation bar. On the FrequencyCount Tab, they can upload a file and then process it to view the 25 most frequent words with their counts, excluding stopwords. On the Frequency Analysis Tab, they can switch in between several menus displaying the ten most recent frequency analyses.
 
 <img src="src/img1.JPG" width="550" height ="275"><nobr>
 <img src="src/img2.JPG" width="550" height ="275"><nobr>
@@ -11,8 +12,4 @@ TUBER allows the user to login to their account, switch between the mentor (tuto
 
 
 
-# curl command for request service
-
-```
-curl 'http://localhost:7777/getMentors?ltude=-74.06725&latitude=40.747&subject=cs'
-```
+# How to run
